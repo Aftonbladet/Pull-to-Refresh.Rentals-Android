@@ -9,7 +9,7 @@
         android:id="@+id/pull_to_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:type="jet">
+        app:type="sun">
 
         <ListView
             android:id="@+id/list_view"

@@ -94,6 +94,8 @@ public class PullToRefreshActivity extends ActionBarActivity {
             case R.id.action_set_jet_refresh_type:
                 mPullToRefreshView.setRefreshType(PullToRefreshView.STYLE_JET);
                 return true;
+            case R.id.action_set_klart_refresh_type:
+                mPullToRefreshView.setRefreshType(PullToRefreshView.STYLE_KLART);
             default:
                 return super.onOptionsItemSelected(item);
         }

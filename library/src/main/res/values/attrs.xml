@@ -4,6 +4,7 @@
         <attr name="type" format="enum">
             <enum name="sun" value="0" />
             <enum name="jet" value="1" />
+            <enum name="klart" value="2" />
         </attr>
     </declare-styleable>
 </resources>

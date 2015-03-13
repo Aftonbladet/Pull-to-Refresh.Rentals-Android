@@ -19,6 +19,7 @@ import android.widget.ImageView;
 
 import com.yalantis.pulltorefresh.library.refresh_view.BaseRefreshView;
 import com.yalantis.pulltorefresh.library.refresh_view.JetRefreshView;
+import com.yalantis.pulltorefresh.library.refresh_view.KlartRefreshView;
 import com.yalantis.pulltorefresh.library.refresh_view.SunRefreshView;
 import com.yalantis.pulltorefresh.library.util.Utils;
 
@@ -32,6 +33,7 @@ public class PullToRefreshView extends ViewGroup {
 
     public static final int STYLE_SUN = 0;
     public static final int STYLE_JET = 1;
+    public static final int STYLE_KLART = 2;
 
     public static final int MAX_OFFSET_ANIMATION_DURATION = 700;
     public static final int MAX_OFFSET_JET_END_ANIMATION_DURATION = 400;
@@ -94,6 +96,9 @@ public class PullToRefreshView extends ViewGroup {
                 break;
             case STYLE_JET:
                 mBaseRefreshView = new JetRefreshView(getContext(), this);
+                break;
+            case STYLE_KLART:
+                mBaseRefreshView = new KlartRefreshView(getContext(), this);
                 break;
             default:
                 throw new InvalidParameterException("Type does not exist");
@@ -377,6 +382,12 @@ public class PullToRefreshView extends ViewGroup {
                     case STYLE_JET: {
                         mBaseRefreshView.setEndOfRefreshing(true);
                         animateOffsetToPosition(mAnimateToEndPosition, true);
+                        break;
+                    }
+                    case STYLE_KLART: {
+                        mBaseRefreshView.setEndOfRefreshing(true);
+                        animateOffsetToPosition(mAnimateToStartPosition, false);
+                        break;
                     }
                 }
             }

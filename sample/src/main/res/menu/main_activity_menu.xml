@@ -6,4 +6,7 @@
     <item
         android:id="@+id/action_set_jet_refresh_type"
         android:title="@string/jet_refresh_style" />
+    <item
+        android:id="@+id/action_set_klart_refresh_type"
+        android:title="@string/klart_refresh_style" />
 </menu>
