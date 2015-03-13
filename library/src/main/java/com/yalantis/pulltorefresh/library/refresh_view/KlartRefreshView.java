@@ -29,10 +29,10 @@ public class KlartRefreshView extends BaseRefreshView implements Animatable {
     private static final float SIDE_CLOUDS_INITIAL_SCALE = 1.05f;
     private static final float SIDE_CLOUDS_FINAL_SCALE = 1.55f;
 
-    private static final float CENTER_CLOUDS_INITIAL_SCALE = 0.8f;
-    private static final float CENTER_CLOUDS_FINAL_SCALE = 1.30f;
+    private static final float CENTER_CLOUDS_INITIAL_SCALE = 1.0f;
+    private static final float CENTER_CLOUDS_FINAL_SCALE = 1.5f;
 
-    private static final float SUN_FINAL_SCALE = 0.75f;
+    private static final float SUN_FINAL_SCALE = 1.5f;
     private static final float SUN_INITIAL_ROTATE_GROWTH = 1.2f;
     private static final float SUN_FINAL_ROTATE_GROWTH = 1.5f;
 
@@ -41,7 +41,9 @@ public class KlartRefreshView extends BaseRefreshView implements Animatable {
 
 
     // Multiply with this animation interpolator time
-    public static final int LOADING_ANIMATION_COEFFICIENT = 80;
+//    public static final int LOADING_ANIMATION_COEFFICIENT = 80;
+    public static final int LOADING_ANIMATION_COEFFICIENT = 640;
+    public static final int CENTER_CLOUDS_LOADING_ANIMATION_COEFFICIENT = 48;
     public static final int SLOW_DOWN_ANIMATION_COEFFICIENT = 6;
     // Amount of lines when is going lading animation
     public static final int Y_SIDE_CLOUDS_SLOW_DOWN_COF = 4;
@@ -50,8 +52,7 @@ public class KlartRefreshView extends BaseRefreshView implements Animatable {
     private PullToRefreshView mParent;
     private Matrix mMatrix;
     private Matrix mAdditionalMatrix;
-    private Animation mJetAnimation;
-    private Animation mSunAnimation;
+    private Animation mAnimation;
 
     private int mTop;
     private int mScreenWidth;
@@ -276,12 +277,8 @@ public class KlartRefreshView extends BaseRefreshView implements Animatable {
         }
 
         float scalePercentDelta = dragPercent - SCALE_START_PERCENT;
-        if (scalePercentDelta > 0) {
-            float scalePercent = scalePercentDelta / (1.0f - SCALE_START_PERCENT);
-            scale = CENTER_CLOUDS_INITIAL_SCALE + (CENTER_CLOUDS_FINAL_SCALE - CENTER_CLOUDS_INITIAL_SCALE) * scalePercent;
-        } else {
-            scale = CENTER_CLOUDS_INITIAL_SCALE;
-        }
+        float scalePercent = scalePercentDelta / (1.0f - SCALE_START_PERCENT);
+        scale = CENTER_CLOUDS_INITIAL_SCALE + (CENTER_CLOUDS_FINAL_SCALE - CENTER_CLOUDS_INITIAL_SCALE) * scalePercent;
 
         float parallaxPercent = 0;
         boolean parallax = false;
@@ -300,18 +297,18 @@ public class KlartRefreshView extends BaseRefreshView implements Animatable {
                 - (parallax ? mFrontCloudHeightCenter + parallaxPercent : mFrontCloudHeightCenter)
                 + (overdrag ? mTop : 0);
 
-        float sx = overdrag ? scale + overdragPercent / 4 : scale;
-        float sy = overdrag ? scale + overdragPercent / 2 : scale;
+        float sx = scale + overdragPercent / 4;
+        float sy = scale + overdragPercent / 2;
 
-        if (isRefreshing && !overdrag) {
+        if (isRefreshing) {
             if (checkCurrentAnimationPart(AnimationPart.FIRST)) {
-                sx = scale - (getAnimationPartValue(AnimationPart.FIRST) / LOADING_ANIMATION_COEFFICIENT) / 8;
+                sx -= (getAnimationPartValue(AnimationPart.FIRST) / CENTER_CLOUDS_LOADING_ANIMATION_COEFFICIENT) / 8;
             } else if (checkCurrentAnimationPart(AnimationPart.SECOND)) {
-                sx = scale - (getAnimationPartValue(AnimationPart.SECOND) / LOADING_ANIMATION_COEFFICIENT) / 8;
+                sx -= (getAnimationPartValue(AnimationPart.SECOND) / CENTER_CLOUDS_LOADING_ANIMATION_COEFFICIENT) / 8;
             } else if (checkCurrentAnimationPart(AnimationPart.THIRD)) {
-                sx = scale + (getAnimationPartValue(AnimationPart.THIRD) / LOADING_ANIMATION_COEFFICIENT) / 6;
+                sx += (getAnimationPartValue(AnimationPart.THIRD) / CENTER_CLOUDS_LOADING_ANIMATION_COEFFICIENT) / 6;
             } else if (checkCurrentAnimationPart(AnimationPart.FOURTH)) {
-                sx = scale + (getAnimationPartValue(AnimationPart.FOURTH) / LOADING_ANIMATION_COEFFICIENT) / 6;
+                sx += (getAnimationPartValue(AnimationPart.FOURTH) / CENTER_CLOUDS_LOADING_ANIMATION_COEFFICIENT) / 6;
             }
             sy = sx;
         }
@@ -431,10 +428,9 @@ public class KlartRefreshView extends BaseRefreshView implements Animatable {
 
     @Override
     public void start() {
-        mJetAnimation.reset();
-        mSunAnimation.reset();
+        mAnimation.reset();
         isRefreshing = true;
-        mParent.startAnimation(mJetAnimation);
+        mParent.startAnimation(mAnimation);
     }
 
     @Override
@@ -445,35 +441,17 @@ public class KlartRefreshView extends BaseRefreshView implements Animatable {
     }
 
     private void setupAnimations() {
-        setupJetAnimations();
-        setupSunAnimation();
-    }
-
-    private void setupJetAnimations() {
-        mJetAnimation = new Animation() {
+        mAnimation = new Animation() {
             @Override
             public void applyTransformation(float interpolatedTime, @NonNull Transformation t) {
                 setLoadingAnimationTime(interpolatedTime);
                 setRotate(interpolatedTime);
             }
         };
-        mJetAnimation.setRepeatCount(Animation.INFINITE);
-        mJetAnimation.setRepeatMode(Animation.REVERSE);
-        mJetAnimation.setInterpolator(ACCELERATE_DECELERATE_INTERPOLATOR);
-        mJetAnimation.setDuration(ANIMATION_DURATION);
-    }
-
-    private void setupSunAnimation() {
-        mSunAnimation = new Animation() {
-            @Override
-            public void applyTransformation(float interpolatedTime, Transformation t) {
-                setRotate(interpolatedTime);
-            }
-        };
-        mSunAnimation.setRepeatCount(Animation.INFINITE);
-        mSunAnimation.setRepeatMode(Animation.RESTART);
-        mSunAnimation.setInterpolator(LINEAR_INTERPOLATOR);
-        mSunAnimation.setDuration(ANIMATION_DURATION);
+        mAnimation.setRepeatCount(Animation.INFINITE);
+        mAnimation.setRepeatMode(Animation.REVERSE);
+        mAnimation.setInterpolator(ACCELERATE_DECELERATE_INTERPOLATOR);
+        mAnimation.setDuration(ANIMATION_DURATION);
     }
 
     private void setLoadingAnimationTime(float loadingAnimationTime) {
